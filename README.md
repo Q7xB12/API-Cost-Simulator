@@ -46,13 +46,7 @@ base fee
 + markup buffer
 ```
 
-## GitHub Pages
 
-After pushing this repo to GitHub:
-
-1. Open the repository settings.
-2. Go to **Pages**.
-3. Set source to the `main` branch.
 4. Select the root folder.
 5. Save.
 
