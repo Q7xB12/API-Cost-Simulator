@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>API Cost Simulator</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Pre-launch cost modeling</p>
+          <h1>API Cost Simulator</h1>
+        </div>
+        <div class="top-actions">
+          <button class="icon-button" id="resetButton" type="button" title="Reset demo data" aria-label="Reset demo data">R</button>
+          <button class="primary-button" id="addProviderButton" type="button">Add Provider</button>
+        </div>
+      </header>
+
+      <section class="summary-grid" aria-label="Cost summary">
+        <article class="summary-card">
+          <span class="metric-label">Normal case</span>
+          <strong id="normalCost">$0</strong>
+          <small id="normalProvider">Lowest provider</small>
+        </article>
+        <article class="summary-card">
+          <span class="metric-label">Worst case</span>
+          <strong id="worstCost">$0</strong>
+          <small id="worstProvider">Highest exposure</small>
+        </article>
+        <article class="summary-card alert-card" id="dangerCard">
+          <span class="metric-label">Danger level</span>
+          <strong id="dangerLevel">Clear</strong>
+          <small id="dangerReason">Under budget</small>
+        </article>
+        <article class="summary-card">
+          <span class="metric-label">Runway at scale</span>
+          <strong id="runwayCost">$0</strong>
+          <small id="runwayLabel">Worst case monthly</small>
+        </article>
+      </section>
+
+      <div class="workspace">
+        <section class="panel assumptions-panel" aria-label="Usage assumptions">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Inputs</p>
+              <h2>Usage Model</h2>
+            </div>
+            <span class="pill">Monthly</span>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              Users
+              <input id="usersInput" type="number" min="0" step="100" value="10000">
+            </label>
+            <label>
+              Actions per user
+              <input id="actionsInput" type="number" min="0" step="1" value="40">
+            </label>
+            <label>
+              Units per action
+              <input id="unitsInput" type="number" min="0" step="1" value="2">
+            </label>
+            <label>
+              Storage GB
+              <input id="storageInput" type="number" min="0" step="10" value="500">
+            </label>
+            <label>
+              Budget cap
+              <input id="budgetInput" type="number" min="0" step="100" value="5000">
+            </label>
+            <label>
+              Gross margin target %
+              <input id="marginInput" type="number" min="1" max="99" step="1" value="70">
+            </label>
+          </div>
+
+          <div class="scenario-controls" aria-label="Scenario multipliers">
+            <label>
+              Best case
+              <input id="bestInput" type="range" min="10" max="100" step="5" value="55">
+              <span id="bestValue">55%</span>
+            </label>
+            <label>
+              Normal case
+              <input id="normalInput" type="range" min="50" max="180" step="5" value="100">
+              <span id="normalValue">100%</span>
+            </label>
+            <label>
+              Worst case
+              <input id="worstInput" type="range" min="100" max="500" step="10" value="240">
+              <span id="worstValue">240%</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel chart-panel" aria-label="Scenario comparison">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Simulation</p>
+              <h2>Provider Cost Curve</h2>
+            </div>
+            <div class="legend" id="chartLegend"></div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="costChart" width="900" height="390" aria-label="Provider cost chart"></canvas>
+          </div>
+        </section>
+      </div>
+
+      <section class="provider-section" aria-label="Provider pricing rules">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Pricing rules</p>
+            <h2>Providers</h2>
+          </div>
+          <p id="providerCount">0 providers</p>
+        </div>
+        <div class="provider-grid" id="providerGrid"></div>
+      </section>
+
+      <section class="table-section" aria-label="Cost comparison">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Compare</p>
+            <h2>Monthly Estimate</h2>
+          </div>
+          <button class="ghost-button" id="exportButton" type="button">Export CSV</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>Best</th>
+                <th>Normal</th>
+                <th>Worst</th>
+                <th>Break-even price/user</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="comparisonBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <template id="providerTemplate">
+      <article class="provider-card">
+        <div class="provider-card-head">
+          <label>
+            Name
+            <input class="provider-name" type="text">
+          </label>
+          <button class="icon-button remove-provider" type="button" title="Remove provider" aria-label="Remove provider">X</button>
+        </div>
+        <div class="provider-fields">
+          <label>
+            Base fee
+            <input class="base-fee" type="number" min="0" step="1">
+          </label>
+          <label>
+            Unit price
+            <input class="unit-price" type="number" min="0" step="0.0001">
+          </label>
+          <label>
+            Included units
+            <input class="included-units" type="number" min="0" step="1000">
+          </label>
+          <label>
+            Storage price / GB
+            <input class="storage-price" type="number" min="0" step="0.01">
+          </label>
+          <label>
+            Free storage GB
+            <input class="free-storage" type="number" min="0" step="10">
+          </label>
+          <label>
+            Markup buffer %
+            <input class="buffer" type="number" min="0" step="1">
+          </label>
+        </div>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
