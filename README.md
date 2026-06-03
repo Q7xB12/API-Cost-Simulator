@@ -18,10 +18,6 @@ This MVP is a static app with no build step.
 
 Open `index.html` directly in your browser:
 
-```text
-file:///D:/miso/index.html
-```
-
 Or, from this folder, start any static server you like.
 
 ## Files
