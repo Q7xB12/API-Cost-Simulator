@@ -45,9 +45,3 @@ base fee
 + max(0, storage GB - free storage GB) * storage price
 + markup buffer
 ```
-
-
-4. Select the root folder.
-5. Save.
-
-GitHub will publish the app as a static site.
